@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campeonato de Atores PRO</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: #0f0f0f;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
+}
+
+h1 { font-size: 20px; margin: 15px 0; }
+
+.stage {
+    color: #00e676;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.bracket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.match {
+    background: #1e1e1e;
+    padding: 12px;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 420px;
+}
+
+.duel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.actor {
+    width: 48%;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 12px;
+    background: #2a2a2a;
+    transition: 0.2s;
+}
+
+.actor:hover { background: #333; }
+
+.actor img {
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #444;
+}
+
+.name { margin-top: 6px; font-size: 12px; }
+
+.vs { font-weight: bold; color: #00e676; }
+
+button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #00e676;
+    color: black;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏆 Campeonato de Atores PRO</h1>
+<div class="stage" id="stage">Oitavas de Final</div>
+
+<div class="bracket" id="bracket"></div>
+
+<button onclick="start()">Reiniciar</button>
+
+<script>
+
+const atores = [
+"Henry Cavill","Chris Evans","Brad Pitt","Ryan Gosling",
+"Gerard Butler","Russell Crowe","Jamie Dornan","Chad Michael Murray",
+"Simon Baker","Mark Ruffalo","Tom Hardy","Theo James",
+"Chris Hemsworth","Harrison Ford","Liam Neeson","Keanu Reeves",
+"Leonardo DiCaprio","Robert Downey Jr.","Denzel Washington","Johnny Depp",
+"Will Smith","Matt Damon","Jake Gyllenhaal","Christian Bale",
+"Cillian Murphy","Benedict Cumberbatch","Morgan Freeman","Al Pacino",
+"Robert De Niro","Tom Hanks","Ryan Reynolds","Joaquin Phoenix"
+];
+
+function img(name){
+    return "https://en.wikipedia.org/wiki/Special:FilePath/" + encodeURIComponent(name) + ".jpg";
+}
+
+let current=[], next=[], index=0, round=0;
+
+const stages=["Oitavas de Final","Quartas de Final","Semifinal","Final"];
+
+function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
+
+function start(){
+    current = shuffle([...atores]);
+    next=[]; index=0; round=0;
+    document.getElementById("stage").innerText=stages[round];
+    render();
+}
+
+function render(){
+    const box=document.getElementById("bracket");
+    box.innerHTML="";
+
+    if(current.length===1){
+        box.innerHTML=`
+        <h2>🏆 CAMPEÃO</h2>
+        <img src="${img(current[0])}" style="width:150px;height:150px;border-radius:12px">
+        <h3>${current[0]}</h3>`;
+        document.getElementById("stage").innerText="Finalizado";
+        return;
+    }
+
+    const a=current[index];
+    const b=current[index+1];
+
+    box.innerHTML=`
+    <div class="match">
+        <div class="duel">
+            <div class="actor" onclick="win('${a}')">
+                <img src="${img(a)}">
+                <div class="name">${a}</div>
+            </div>
+
+            <div class="vs">VS</div>
+
+            <div class="actor" onclick="win('${b}')">
+                <img src="${img(b)}">
+                <div class="name">${b}</div>
+            </div>
+        </div>
+    </div>`;
+
+}
+
+function win(w){
+    next.push(w);
+    index+=2;
+
+    if(index>=current.length){
+        current=next;
+        next=[];
+        index=0;
+        round++;
+        document.getElementById("stage").innerText=stages[round]||"Final";
+    }
+    render();
+}
+
+start();
+
+</script>
+
+</body>
+</html>
