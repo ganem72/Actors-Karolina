@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bracket - Atores Mais Bonitos</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
+
+body{
+
+    background:#0f1115;
+    color:white;
+    min-height:100vh;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+}
+
+#container{
+
+    width:95%;
+    max-width:1200px;
+
+}
+
+h1{
+
+    text-align:center;
+    font-size:2rem;
+    margin-bottom:15px;
+
+}
+
+#round{
+
+    text-align:center;
+    color:#999;
+    margin-bottom:25px;
+
+}
+
+#progressBar{
+
+    width:100%;
+    height:10px;
+    background:#222;
+    border-radius:20px;
+    overflow:hidden;
+    margin-bottom:30px;
+
+}
+
+#progress{
+
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,#4CAF50,#00d084);
+    transition:.4s;
+
+}
+
+#battle{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:30px;
+    flex-wrap:wrap;
+
+}
+
+.card{
+
+    width:45%;
+    min-width:280px;
+
+    background:#181b22;
+
+    border-radius:20px;
+
+    overflow:hidden;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+
+}
+
+.card:hover{
+
+    transform:scale(1.03);
+
+}
+
+.card img{
+
+    width:100%;
+    height:470px;
+    object-fit:cover;
+    display:block;
+
+}
+
+.card h2{
+
+    padding:18px;
+    text-align:center;
+    font-size:1.3rem;
+
+}
+
+.vs{
+
+    font-size:40px;
+    font-weight:bold;
+    color:#777;
+
+}
+
+#champion{
+
+    display:none;
+    text-align:center;
+
+}
+
+#champion img{
+
+    width:300px;
+    max-width:90%;
+    border-radius:18px;
+    margin:20px auto;
+
+}
+
+button{
+
+    margin-top:25px;
+    padding:15px 35px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#4CAF50;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+}
+
+button:hover{
+
+    background:#3da546;
+
+}
+
+@media(max-width:850px){
+
+.card{
+
+width:100%;
+
+}
+
+.card img{
+
+height:420px;
+
+}
+
+.vs{
+
+display:none;
+
+}
+
+}
+
+.fade{
+
+animation:fade .25s;
+
+}
+
+@keyframes fade{
+
+from{
+
+opacity:0;
+transform:translateY(10px);
+
+}
+
+to{
+
+opacity:1;
+transform:translateY(0);
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="container">
+
+<h1>🏆 Quem é o ator mais bonito?</h1>
+
+<div id="round">
+Confronto
+</div>
+
+<div id="progressBar">
+
+<div id="progress"></div>
+
+</div>
+
+<div id="battle" class="fade">
+
+<!-- preenchido via javascript -->
+
+</div>
+
+<div id="champion">
+
+<h1>🏆 Campeão</h1>
+
+<img id="winnerImage">
+
+<h2 id="winnerName"></h2>
+
+<button onclick="restart()">
+Jogar novamente
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const actors = [{
+name:"Henry Cavill",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Henry_Cavill_by_Gage_Skidmore.jpg"
+},
+
+{
+name:"Chris Evans",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Chris_Evans_by_Gage_Skidmore_2.jpg"
+},
+
+{
+name:"Brad Pitt",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Brad_Pitt_2019.jpg"
+},
+
+{
+name:"Ryan Gosling",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Ryan_Gosling_Cannes_2011.jpg"
+},
+
+{
+name:"Gerard Butler",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Gerard_Butler_2018.jpg"
+},
+
+{
+name:"Russell Crowe",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Russell_Crowe_Cannes_2016.jpg"
+},
+
+{
+name:"Jamie Dornan",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Jamie_Dornan_2013.jpg"
+},
+
+{
+name:"Chad Michael Murray",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Chad_Michael_Murray_2012.jpg"
+},
+
+{
+name:"Simon Baker",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Simon_Baker_2013.jpg"
+},
+
+{
+name:"Mark Ruffalo",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Mark_Ruffalo_%2848428523956%29.jpg"
+},
+
+{
+name:"Tom Hardy",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Tom_Hardy_2018.jpg"
+},
+
+{
+name:"Theo James",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Theo_James_2014.jpg"
+},
+
+{
+name:"Chris Hemsworth",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Chris_Hemsworth_by_Gage_Skidmore_2.jpg"
+},
+
+{
+name:"Harrison Ford",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Harrison_Ford_by_Gage_Skidmore.jpg"
+},
+
+{
+name:"Liam Neeson",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Liam_Neeson_2012.jpg"
+},
+
+{
+name:"Keanu Reeves",
+img:"https://commons.wikimedia.org/wiki/Special:FilePath/Keanu_Reeves_2019.jpg"
+}
+
+];
+
+let currentRound=[...actors];
+
+let nextRound=[];
+
+let currentIndex=0;
+
+let totalMatches=15;
+
+let completedMatches=0;
+
+const battle=document.getElementById("battle");
+
+const champion=document.getElementById("champion");
+
+const winnerImage=document.getElementById("winnerImage");
+
+const winnerName=document.getElementById("winnerName");
+
+const progress=document.getElementById("progress");
+
+const round=document.getElementById("round");
+
+function updateProgress(){
+
+const percent=(completedMatches/totalMatches)*100;
+
+progress.style.width=percent+"%";
+
+}
+
+function updateRound(){
+
+round.innerHTML=`Confronto <b>${completedMatches+1}</b> de <b>${totalMatches}</b>`;
+
+}
+
+function renderBattle(){
+
+battle.classList.remove("fade");
+
+setTimeout(()=>battle.classList.add("fade"),10);
+if(currentRound.length==1){
+
+battle.style.display="none";
+
+champion.style.display="block";
+
+winnerName.textContent=currentRound[0].name;
+
+winnerImage.src=currentRound[0].img;
+
+progress.style.width="100%";
+
+round.innerHTML="Campeão";
+
+return;
+
+}
+
+if(currentIndex>=currentRound.length){
+
+currentRound=[...nextRound];
+
+nextRound=[];
+
+currentIndex=0;
+
+renderBattle();
+
+return;
+
+}
+
+updateRound();
+
+updateProgress();
+
+const left=currentRound[currentIndex];
+
+const right=currentRound[currentIndex+1];
+
+battle.innerHTML=`
+
+<div class="card" onclick="choose(0)">
+
+<img src="${left.img}" alt="${left.name}" loading="lazy">
+
+<h2>${left.name}</h2>
+
+</div>
+
+<div class="vs">
+
+VS
+
+</div>
+
+<div class="card" onclick="choose(1)">
+
+<img src="${right.img}" alt="${right.name}" loading="lazy">
+
+<h2>${right.name}</h2>
+
+</div>
+
+`;
+
+}
+
+function choose(side){
+
+if(side===0){
+
+nextRound.push(currentRound[currentIndex]);
+
+}else{
+
+nextRound.push(currentRound[currentIndex+1]);
+
+}
+
+completedMatches++;
+
+currentIndex+=2;
+
+setTimeout(renderBattle,180);
+
+}
+
+function shuffle(array){
+
+for(let i=array.length-1;i>0;i--){
+
+const j=Math.floor(Math.random()*(i+1));
+
+[array[i],array[j]]=[array[j],array[i]];
+
+}
+
+return array;
+
+}
+
+function restart(){
+
+currentRound=shuffle([...actors]);
+
+nextRound=[];
+
+currentIndex=0;
+
+completedMatches=0;
+
+battle.style.display="flex";
+
+champion.style.display="none";
+
+renderBattle();
+
+}
+
+shuffle(currentRound);
+
+renderBattle();
+// Corrige imagens quebradas
+document.addEventListener("error", function(e){
+
+    if(e.target.tagName==="IMG"){
+
+        e.target.src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/512px-No-Image-Placeholder.svg.png";
+
+    }
+
+},true);
+
+// Pré-carrega todas as imagens para deixar a navegação mais fluida
+actors.forEach(actor=>{
+
+    const img=new Image();
+
+    img.src=actor.img;
+
+});
+
+// Navegação por teclado (PC)
+document.addEventListener("keydown",function(e){
+
+    if(currentRound.length<=1) return;
+
+    if(e.key==="ArrowLeft"){
+
+        choose(0);
+
+    }
+
+    if(e.key==="ArrowRight"){
+
+        choose(1);
+
+    }
+
+});
+
+</script>
+
+</body>
+
+</html>
