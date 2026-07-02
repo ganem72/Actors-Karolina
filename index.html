@@ -1,33 +1,204 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bracket de Atores</title>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Campeonato de Atores</title>
+
 <style>
-body{margin:0;background:#111;color:#fff;font-family:Arial;text-align:center}
-h1{padding:16px}
-.wrap{display:flex;justify-content:center;gap:12px;padding:12px;flex-wrap:wrap}
-.card{background:#222;border-radius:14px;overflow:hidden;width:45%;min-width:160px;cursor:pointer}
-.card img{width:100%;height:280px;object-fit:cover}
-.card h2{font-size:18px;padding:8px}
-button{padding:10px 18px;margin:20px}
-</style></head><body>
-<h1>Quem é o ator mais bonito?</h1><div id="status"></div><div id="app" class="wrap"></div>
-<script>
-const actors=[
-["Henry Cavill","https://commons.wikimedia.org/wiki/Special:FilePath/Henry_Cavill_by_Gage_Skidmore.jpg"],
-["Chris Evans","https://commons.wikimedia.org/wiki/Special:FilePath/Chris_Evans_by_Gage_Skidmore_2.jpg"],
-["Brad Pitt","https://commons.wikimedia.org/wiki/Special:FilePath/Brad_Pitt_2019.jpg"],
-["Ryan Gosling","https://commons.wikimedia.org/wiki/Special:FilePath/Ryan_Gosling_Cannes_2011.jpg"],
-["Mark Ruffalo","https://commons.wikimedia.org/wiki/Special:FilePath/Mark_Ruffalo_%2848428523956%29.jpg"],
-["Gerard Butler","https://commons.wikimedia.org/wiki/Special:FilePath/Gerard_Butler_2018.jpg"],
-["Harrison Ford","https://commons.wikimedia.org/wiki/Special:FilePath/Harrison_Ford_by_Gage_Skidmore.jpg"],
-["Liam Neeson","https://commons.wikimedia.org/wiki/Special:FilePath/Liam_Neeson_2012.jpg"]];
-let round=[...actors],next=[],i=0;
-function draw(){
- if(round.length==1){app.innerHTML=`<div><h2>🏆 ${round[0][0]}</h2><img src="${round[0][1]}" style="max-width:90%;border-radius:12px"><br><button onclick="location.reload()">Recomeçar</button></div>`;status.textContent="Campeão";return;}
- if(i>=round.length){round=next;next=[];i=0;}
- status.textContent=`Confronto ${i/2+1} de ${round.length/2}`;
- let a=round[i],b=round[i+1];
- app.innerHTML=`<div class=card onclick='pick(0)'><img src='${a[1]}'><h2>${a[0]}</h2></div><div class=card onclick='pick(1)'><img src='${b[1]}'><h2>${b[0]}</h2></div>`;
+body {
+    font-family: Arial;
+    background: #111;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 10px;
 }
-function pick(x){next.push(round[i+x]);i+=2;draw();}
-draw();
-</script></body></html>
+
+h1 {
+    font-size: 20px;
+    margin: 15px 0;
+}
+
+.stage {
+    font-size: 14px;
+    color: #00c853;
+    margin-bottom: 10px;
+}
+
+.bracket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.match {
+    background: #222;
+    padding: 12px;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 420px;
+}
+
+.duel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.actor {
+    width: 45%;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 10px;
+    transition: 0.2s;
+}
+
+.actor:hover {
+    background: #333;
+}
+
+.actor img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #444;
+}
+
+.vs {
+    font-weight: bold;
+    color: #00c853;
+}
+
+button {
+    margin-top: 15px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #00c853;
+    color: white;
+    font-size: 16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🏆 Campeonato de Atores</h1>
+<div class="stage" id="stage">Oitavas de Final</div>
+
+<div class="bracket" id="bracket"></div>
+
+<button onclick="start()">Reiniciar Campeonato</button>
+
+<script>
+
+const atores = [
+"Henry Cavill","Chris Evans","Brad Pitt","Ryan Gosling",
+"Gerard Butler","Russell Crowe","Jamie Dornan","Chad Michael Murray",
+"Simon Baker","Mark Ruffalo","Tom Hardy","Theo James",
+"Chris Hemsworth","Harrison Ford","Liam Neeson","Keanu Reeves",
+"Leonardo DiCaprio","Robert Downey Jr.","Denzel Washington","Johnny Depp",
+"Will Smith","Matt Damon","Jake Gyllenhaal","Christian Bale",
+"Joaquin Phoenix","Cillian Murphy","Benedict Cumberbatch","Morgan Freeman",
+"Al Pacino","Robert De Niro","Tom Hanks","Ryan Reynolds"
+];
+
+function img(name) {
+    return `https://picsum.photos/seed/${encodeURIComponent(name)}/200/200`;
+}
+
+let currentRound = [];
+let nextRound = [];
+let matchIndex = 0;
+let stageIndex = 0;
+
+const stages = [
+"Oitavas de Final",
+"Quartas de Final",
+"Semifinal",
+"Final"
+];
+
+function shuffle(a) {
+    return a.sort(() => Math.random() - 0.5);
+}
+
+function start() {
+    currentRound = shuffle([...atores]);
+    nextRound = [];
+    matchIndex = 0;
+    stageIndex = 0;
+
+    document.getElementById("stage").innerText = stages[stageIndex];
+    renderMatch();
+}
+
+function renderMatch() {
+    const container = document.getElementById("bracket");
+    container.innerHTML = "";
+
+    if (currentRound.length === 1) {
+        container.innerHTML = `
+            <h2>🏆 Campeão</h2>
+            <img src="${img(currentRound[0])}" style="width:120px;height:120px;border-radius:50%">
+            <h3>${currentRound[0]}</h3>
+        `;
+        document.getElementById("stage").innerText = "Campeão definido!";
+        return;
+    }
+
+    const a = currentRound[matchIndex];
+    const b = currentRound[matchIndex + 1];
+
+    const match = document.createElement("div");
+    match.className = "match";
+
+    match.innerHTML = `
+        <div class="duel">
+
+            <div class="actor" onclick="pickWinner('${a}')">
+                <img src="${img(a)}">
+                <div>${a}</div>
+            </div>
+
+            <div class="vs">VS</div>
+
+            <div class="actor" onclick="pickWinner('${b}')">
+                <img src="${img(b)}">
+                <div>${b}</div>
+            </div>
+
+        </div>
+    `;
+
+    container.appendChild(match);
+}
+
+function pickWinner(winner) {
+    nextRound.push(winner);
+    matchIndex += 2;
+
+    if (matchIndex >= currentRound.length) {
+        currentRound = nextRound;
+        nextRound = [];
+        matchIndex = 0;
+        stageIndex++;
+
+        document.getElementById("stage").innerText =
+            stages[stageIndex] || "Final";
+
+    }
+
+    renderMatch();
+}
+
+start();
+
+</script>
+
+</body>
+</html>
